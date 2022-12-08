@@ -46,6 +46,10 @@ inputs:
   append_body:
     description: "Append to existing body instead of overwriting it. Default is false."
     required: false
+  recreate_release:
+    description: "When to recreate the release instead of updating it (will update the time and put it above other releases). Valid values : never|commit|always. Default value is 'never'"
+    required: false
+    default: "never"
 env:
   "GITHUB_TOKEN": "As provided by Github Actions"
 outputs:
