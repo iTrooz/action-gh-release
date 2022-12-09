@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { GitHub } from "@actions/github/lib/utils";
+import { exec } from "@actions/exec";
 import { Config, isTag, releaseBody } from "./util";
 import { statSync, readFileSync } from "fs";
 import { getType } from "mime";
@@ -71,6 +72,12 @@ export interface Releaser {
     repo: string;
     release_id: number;
   });
+
+  getCommitSha(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+  }): Promise<string>;
 }
 
 export class GitHubReleaser implements Releaser {
@@ -134,6 +141,18 @@ export class GitHubReleaser implements Releaser {
     release_id: number;
   }) {
     this.github.rest.repos.deleteRelease(params);
+  }
+
+  getCommitSha(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+  }): Promise<string> {
+    return new Promise(resolve => {
+      this.github.rest.repos.getCommit(params).then(value =>{
+        resolve(value.data.sha)
+      })
+    })
   }
 }
 
@@ -243,9 +262,22 @@ export const release = async (
       })
       throw {"status":404}
     }else if(config.input_recreate_release === "commit"){
-      throw "NOTIMPLEMENTED"
-    } // else never recreate, so update it
+      let releaseCommit = await releaser.getCommitSha({
+        owner: owner,
+        repo: repo,
+        ref: existingRelease.data.tag_name
+      });
       
+      if(await isAncestor({potencialAncestor: config.github_ref, potencialDescendant: releaseCommit})){
+        releaser.deleteRelease({
+          owner,
+          repo,
+          release_id: existingRelease.data.id
+        })
+        throw {"status":404}
+      } // not sure what to do in case releaseCommit is after the current ref
+    } // else never recreate, so update it
+
 
     const release_id = existingRelease.data.id;
     let target_commitish: string;
@@ -347,3 +379,14 @@ export const release = async (
     }
   }
 };
+
+export const isAncestor = (params:{
+  potencialAncestor: string,
+  potencialDescendant: string,
+}): Promise<boolean> => {
+  return new Promise(resolve =>{
+    exec('git', ['merge-base', '--is-ancestor', params.potencialAncestor, params.potencialDescendant]).then(value=>
+      resolve(value==0)
+    )
+  })
+}
