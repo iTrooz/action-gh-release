@@ -67,10 +67,10 @@ export interface Releaser {
     repo: string;
   }): AsyncIterableIterator<{ data: Release[] }>;
 
-  deleteRelease(params: {
+  deleteRef(params: {
     owner: string;
     repo: string;
-    release_id: number;
+    ref: string;
   });
 
   getCommitSha(params: {
@@ -135,12 +135,12 @@ export class GitHubReleaser implements Releaser {
     );
   }
 
-  deleteRelease(params: {
+  deleteRef(params: {
     owner: string;
     repo: string;
-    release_id: number;
+    ref: string;
   }) {
-    this.github.rest.repos.deleteRelease(params);
+    this.github.rest.git.deleteRef(params);
   }
 
   getCommitSha(params: {
@@ -255,10 +255,10 @@ export const release = async (
 
 
     if(config.input_recreate_release === "always"){
-      releaser.deleteRelease({
+      releaser.deleteRef({
         owner,
         repo,
-        release_id: existingRelease.data.id
+        ref: existingRelease.data.tag_name
       })
       throw {"status":404}
     }else if(config.input_recreate_release === "commit"){
@@ -269,10 +269,10 @@ export const release = async (
       });
       
       if(await isAncestor({potencialAncestor: config.github_ref, potencialDescendant: releaseCommit})){
-        releaser.deleteRelease({
+        releaser.deleteRef({
           owner,
           repo,
-          release_id: existingRelease.data.id
+          ref: existingRelease.data.tag_name
         })
         throw {"status":404}
       } // not sure what to do in case releaseCommit is after the current ref
