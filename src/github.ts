@@ -255,7 +255,7 @@ export const release = async (
 
 
     if(config.input_recreate_release === "always"){
-      releaser.deleteRef({
+      await releaser.deleteRef({
         owner,
         repo,
         ref: existingRelease.data.tag_name
@@ -269,7 +269,7 @@ export const release = async (
       });
       
       if(await isAncestor({potencialAncestor: config.github_ref, potencialDescendant: releaseCommit})){
-        releaser.deleteRef({
+          await releaser.deleteRef({
           owner,
           repo,
           ref: existingRelease.data.tag_name
