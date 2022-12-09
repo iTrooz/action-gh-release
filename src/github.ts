@@ -65,6 +65,12 @@ export interface Releaser {
     owner: string;
     repo: string;
   }): AsyncIterableIterator<{ data: Release[] }>;
+
+  deleteRelease(params: {
+    owner: string;
+    repo: string;
+    release_id: number;
+  });
 }
 
 export class GitHubReleaser implements Releaser {
@@ -120,6 +126,14 @@ export class GitHubReleaser implements Releaser {
     return this.github.paginate.iterator(
       this.github.rest.repos.listReleases.endpoint.merge(updatedParams)
     );
+  }
+
+  deleteRelease(params: {
+    owner: string;
+    repo: string;
+    release_id: number;
+  }) {
+    this.github.rest.repos.deleteRelease(params);
   }
 }
 
@@ -217,6 +231,21 @@ export const release = async (
       repo,
       tag,
     });
+
+    existingRelease.data.target_commitish;
+
+
+    if(config.input_recreate_release === "always"){
+      releaser.deleteRelease({
+        owner,
+        repo,
+        release_id: existingRelease.data.id
+      })
+      throw {"status":404}
+    }else if(config.input_recreate_release === "commit"){
+      throw "NOTIMPLEMENTED"
+    } // else never recreate, so update it
+      
 
     const release_id = existingRelease.data.id;
     let target_commitish: string;
