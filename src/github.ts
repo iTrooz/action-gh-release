@@ -276,6 +276,9 @@ export const release = async (
         }
       }
     }
+
+    console.log(`Trying to get a release for tag: ${tag}`);
+
     let existingRelease = await releaser.getReleaseByTag({
       owner,
       repo,
