@@ -299,19 +299,19 @@ export const release = async (
         ref: "tags/"+existingRelease.data.tag_name
       })
       console.log(`Delete ref ${"tags/"+existingRelease.data.tag_name}`);
-      let releaseCommit = await releaser.getCommitSha({
-        owner: owner,
-        repo: repo,
-        ref: existingRelease.data.tag_name
-      });
-      console.log(`Get commit sha from tag ${existingRelease.data.tag_name}: ${releaseCommit}`);
-      await releaser.createRef({
-        owner,
-        repo,
-        ref: "tags/"+existingRelease.data.tag_name,
-        sha: releaseCommit
-      })
-      console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
+      // let releaseCommit = await releaser.getCommitSha({
+      //   owner: owner,
+      //   repo: repo,
+      //   ref: existingRelease.data.tag_name
+      // });
+      // console.log(`Get commit sha from tag ${existingRelease.data.tag_name}: ${releaseCommit}`);
+      // await releaser.createRef({
+      //   owner,
+      //   repo,
+      //   ref: "tags/"+existingRelease.data.tag_name,
+      //   sha: releaseCommit
+      // })
+      // console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
       
     }else if(config.input_recreate_release === "commit"){
       let releaseCommit = await releaser.getCommitSha({
