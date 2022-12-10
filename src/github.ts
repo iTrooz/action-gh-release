@@ -440,7 +440,7 @@ export const release = async (
   //   console.log(error)
   // }
   
-  throw new Error("a");
+  throw new Error("Action finished !");
 };
 
 export const isAncestor = (params:{
