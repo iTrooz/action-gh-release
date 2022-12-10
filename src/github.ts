@@ -258,7 +258,7 @@ export const release = async (
       await releaser.deleteRef({
         owner,
         repo,
-        ref: existingRelease.data.tag_name
+        ref: "tags/"+existingRelease.data.tag_name
       })
       throw {"status":404}
     }else if(config.input_recreate_release === "commit"){
@@ -272,7 +272,7 @@ export const release = async (
           await releaser.deleteRef({
           owner,
           repo,
-          ref: existingRelease.data.tag_name
+          ref: "tags/"+existingRelease.data.tag_name
         })
         throw {"status":404}
       } // not sure what to do in case releaseCommit is after the current ref
