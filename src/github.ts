@@ -269,11 +269,11 @@ export const release = async (
 
 
     if(config.input_recreate_release === "always"){
-      await releaser.deleteRelease({
-        owner,
-        repo,
-        release_id: existingRelease.data.id
-      })
+      // await releaser.deleteRelease({
+      //   owner,
+      //   repo,
+      //   release_id: existingRelease.data.id
+      // })
       await releaser.deleteRef({
         owner,
         repo,
@@ -288,11 +288,11 @@ export const release = async (
       });
       
       if(await isAncestor({potencialAncestor: config.github_ref, potencialDescendant: releaseCommit})){
-        await releaser.deleteRelease({
-          owner,
-          repo,
-          release_id: existingRelease.data.id
-        })
+        // await releaser.deleteRelease({
+        //   owner,
+        //   repo,
+        //   release_id: existingRelease.data.id
+        // })
         await releaser.deleteRef({
           owner,
           repo,
