@@ -386,6 +386,7 @@ export const release = async (
     // });
     // return release.data;
   } catch (error) {
+    throw error;
     if (error.status === 404) {
       const tag_name = tag;
       const name = config.input_name || tag;
