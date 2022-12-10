@@ -333,58 +333,58 @@ export const release = async (
     } // else never recreate, so update it
 
 
-    const release_id = existingRelease.data.id;
-    let target_commitish: string;
-    if (
-      config.input_target_commitish &&
-      config.input_target_commitish !== existingRelease.data.target_commitish
-    ) {
-      console.log(
-        `Updating commit from "${existingRelease.data.target_commitish}" to "${config.input_target_commitish}"`
-      );
-      target_commitish = config.input_target_commitish;
-    } else {
-      target_commitish = existingRelease.data.target_commitish;
-    }
+    // const release_id = existingRelease.data.id;
+    // let target_commitish: string;
+    // if (
+    //   config.input_target_commitish &&
+    //   config.input_target_commitish !== existingRelease.data.target_commitish
+    // ) {
+    //   console.log(
+    //     `Updating commit from "${existingRelease.data.target_commitish}" to "${config.input_target_commitish}"`
+    //   );
+    //   target_commitish = config.input_target_commitish;
+    // } else {
+    //   target_commitish = existingRelease.data.target_commitish;
+    // }
 
-    const tag_name = tag;
-    const name = config.input_name || existingRelease.data.name || tag;
-    // revisit: support a new body-concat-strategy input for accumulating
-    // body parts as a release gets updated. some users will likely want this while
-    // others won't previously this was duplicating content for most which
-    // no one wants
-    const workflowBody = releaseBody(config) || "";
-    const existingReleaseBody = existingRelease.data.body || "";
-    let body: string;
-    if (config.input_append_body && workflowBody && existingReleaseBody) {
-      body = existingReleaseBody + "\n" + workflowBody;
-    } else {
-      body = workflowBody || existingReleaseBody;
-    }
+    // const tag_name = tag;
+    // const name = config.input_name || existingRelease.data.name || tag;
+    // // revisit: support a new body-concat-strategy input for accumulating
+    // // body parts as a release gets updated. some users will likely want this while
+    // // others won't previously this was duplicating content for most which
+    // // no one wants
+    // const workflowBody = releaseBody(config) || "";
+    // const existingReleaseBody = existingRelease.data.body || "";
+    // let body: string;
+    // if (config.input_append_body && workflowBody && existingReleaseBody) {
+    //   body = existingReleaseBody + "\n" + workflowBody;
+    // } else {
+    //   body = workflowBody || existingReleaseBody;
+    // }
 
-    const draft =
-      config.input_draft !== undefined
-        ? config.input_draft
-        : existingRelease.data.draft;
-    const prerelease =
-      config.input_prerelease !== undefined
-        ? config.input_prerelease
-        : existingRelease.data.prerelease;
+    // const draft =
+    //   config.input_draft !== undefined
+    //     ? config.input_draft
+    //     : existingRelease.data.draft;
+    // const prerelease =
+    //   config.input_prerelease !== undefined
+    //     ? config.input_prerelease
+    //     : existingRelease.data.prerelease;
 
-    const release = await releaser.updateRelease({
-      owner,
-      repo,
-      release_id,
-      tag_name,
-      target_commitish,
-      name,
-      body,
-      draft,
-      prerelease,
-      discussion_category_name,
-      generate_release_notes,
-    });
-    return release.data;
+    // const release = await releaser.updateRelease({
+    //   owner,
+    //   repo,
+    //   release_id,
+    //   tag_name,
+    //   target_commitish,
+    //   name,
+    //   body,
+    //   draft,
+    //   prerelease,
+    //   discussion_category_name,
+    //   generate_release_notes,
+    // });
+    // return release.data;
   } catch (error) {
     if (error.status === 404) {
       const tag_name = tag;
