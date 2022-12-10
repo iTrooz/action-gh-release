@@ -247,7 +247,7 @@ export const release = async (
   config: Config,
   releaser: Releaser,
   maxRetries: number = 3
-): Promise<Release> => {
+): Promise<Release|null> => {
   if (maxRetries <= 0) {
     console.log(`❌ Too many retries. Aborting...`);
     throw new Error("Too many retries.");
@@ -440,7 +440,7 @@ export const release = async (
   //   console.log(error)
   // }
   
-  throw new Error("Action finished !");
+  return null;
 };
 
 export const isAncestor = (params:{
