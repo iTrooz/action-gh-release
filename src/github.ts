@@ -79,6 +79,14 @@ export interface Releaser {
     ref: string;
   });
 
+
+  createRef(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+    sha: string;
+  });
+
   getCommitSha(params: {
     owner: string;
     repo: string;
@@ -155,6 +163,15 @@ export class GitHubReleaser implements Releaser {
     ref: string;
   }) {
     this.github.rest.git.deleteRef(params);
+  }
+
+  createRef(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+    sha: string;
+  }) {
+    this.github.rest.git.createRef(params);
   }
 
   getCommitSha(params: {
@@ -279,7 +296,18 @@ export const release = async (
         repo,
         ref: "tags/"+existingRelease.data.tag_name
       })
-      throw {"status":404}
+      let releaseCommit = await releaser.getCommitSha({
+        owner: owner,
+        repo: repo,
+        ref: existingRelease.data.tag_name
+      });
+      await releaser.createRef({
+        owner,
+        repo,
+        ref: "tags/"+existingRelease.data.tag_name,
+        sha: releaseCommit
+      })
+      
     }else if(config.input_recreate_release === "commit"){
       let releaseCommit = await releaser.getCommitSha({
         owner: owner,
@@ -298,7 +326,7 @@ export const release = async (
           repo,
           ref: "tags/"+existingRelease.data.tag_name
         })
-        throw {"status":404}
+        throw "NOTIMPLEMENTED"
       } // not sure what to do in case releaseCommit is after the current ref
     } // else never recreate, so update it
 
