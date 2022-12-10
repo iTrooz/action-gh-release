@@ -67,6 +67,12 @@ export interface Releaser {
     repo: string;
   }): AsyncIterableIterator<{ data: Release[] }>;
 
+  deleteRelease(params: {
+    owner: string;
+    repo: string;
+    release_id: number;
+  });
+
   deleteRef(params: {
     owner: string;
     repo: string;
@@ -133,6 +139,14 @@ export class GitHubReleaser implements Releaser {
     return this.github.paginate.iterator(
       this.github.rest.repos.listReleases.endpoint.merge(updatedParams)
     );
+  }
+
+  deleteRelease(params: {
+    owner: string;
+    repo: string;
+    release_id: number;
+  }) {
+    this.github.rest.repos.deleteRelease(params);
   }
 
   deleteRef(params: {
@@ -255,6 +269,11 @@ export const release = async (
 
 
     if(config.input_recreate_release === "always"){
+      await releaser.deleteRelease({
+        owner,
+        repo,
+        release_id: existingRelease.data.id
+      })
       await releaser.deleteRef({
         owner,
         repo,
@@ -269,7 +288,12 @@ export const release = async (
       });
       
       if(await isAncestor({potencialAncestor: config.github_ref, potencialDescendant: releaseCommit})){
-          await releaser.deleteRef({
+        await releaser.deleteRelease({
+          owner,
+          repo,
+          release_id: existingRelease.data.id
+        })
+        await releaser.deleteRef({
           owner,
           repo,
           ref: "tags/"+existingRelease.data.tag_name
