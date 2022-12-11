@@ -305,13 +305,13 @@ export const release = async (
         ref: existingRelease.data.tag_name
       });
       console.log(`Get commit sha from tag ${existingRelease.data.tag_name}: ${releaseCommit}`);
-      // await releaser.createRef({
-      //   owner,
-      //   repo,
-      //   ref: "tags/"+existingRelease.data.tag_name,
-      //   sha: releaseCommit
-      // })
-      // console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
+      await releaser.createRef({
+        owner,
+        repo,
+        ref: "tags/"+existingRelease.data.tag_name,
+        sha: releaseCommit
+      })
+      console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
       
     }else if(config.input_recreate_release === "commit"){
       let releaseCommit = await releaser.getCommitSha({
