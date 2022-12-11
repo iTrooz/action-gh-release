@@ -11,7 +11,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-     
+    
+      - name: Update release tag
+        run: |
+          git tag -d test
+          git push origin :refs/tags/test
+          git tag test
+          git push origin refs/tags/test
+
       - name: Run
         uses: ./
         with:
