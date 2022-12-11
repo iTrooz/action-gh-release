@@ -303,7 +303,7 @@ export const release = async (
         owner,
         repo,
         ref: "refs/tags/"+existingRelease.data.tag_name,
-        sha: config.github_ref
+        sha: config.github_sha
       })
       console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
       
