@@ -23,4 +23,3 @@ jobs:
         uses: ./
         with:
           tag_name: test
-          recreate_release: always
