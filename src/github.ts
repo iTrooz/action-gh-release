@@ -308,7 +308,7 @@ export const release = async (
       await releaser.createRef({
         owner,
         repo,
-        ref: "tags/"+existingRelease.data.tag_name,
+        ref: "refs/tags/"+existingRelease.data.tag_name,
         sha: releaseCommit
       })
       console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
