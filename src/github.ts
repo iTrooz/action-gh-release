@@ -73,14 +73,7 @@ export interface Releaser {
     release_id: number;
   });
 
-  deleteRef(params: {
-    owner: string;
-    repo: string;
-    ref: string;
-  });
-
-
-  createRef(params: {
+  updateRef(params: {
     owner: string;
     repo: string;
     ref: string;
@@ -157,21 +150,13 @@ export class GitHubReleaser implements Releaser {
     this.github.rest.repos.deleteRelease(params);
   }
 
-  deleteRef(params: {
-    owner: string;
-    repo: string;
-    ref: string;
-  }) {
-    this.github.rest.git.deleteRef(params);
-  }
-
-  createRef(params: {
+  updateRef(params: {
     owner: string;
     repo: string;
     ref: string;
     sha: string;
   }) {
-    this.github.rest.git.createRef(params);
+    this.github.rest.git.updateRef(params);
   }
 
   getCommitSha(params: {
@@ -288,24 +273,13 @@ export const release = async (
     console.log(`got a release for the tag ${tag}: ${existingRelease.data.name}`);
 
     if(config.input_recreate_release === "always"){
-      // await releaser.deleteRelease({
-      //   owner,
-      //   repo,
-      //   release_id: existingRelease.data.id
-      // })
-      await releaser.deleteRef({
+      await releaser.updateRef({
         owner,
         repo,
-        ref: "tags/"+existingRelease.data.tag_name
-      })
-      console.log(`Delete ref ${"tags/"+existingRelease.data.tag_name}`);
-      await releaser.createRef({
-        owner,
-        repo,
-        ref: "refs/tags/"+existingRelease.data.tag_name,
+        ref: "tags/"+existingRelease.data.tag_name,
         sha: config.github_sha
       })
-      console.log(`Re-created ref ${"tags/"+existingRelease.data.tag_name}`);
+      console.log(`Updated ref/tags/${existingRelease.data.tag_name} to ${config.github_sha}`);
       
     }else if(config.input_recreate_release === "commit"){
       let releaseCommit = await releaser.getCommitSha({
@@ -320,11 +294,6 @@ export const release = async (
         //   repo,
         //   release_id: existingRelease.data.id
         // })
-        await releaser.deleteRef({
-          owner,
-          repo,
-          ref: "tags/"+existingRelease.data.tag_name
-        })
         throw "NOTIMPLEMENTED"
       } // not sure what to do in case releaseCommit is after the current ref
     } // else never recreate, so update it
