@@ -14,8 +14,8 @@ jobs:
     
       - name: Update release tag
         run: |
-          git tag -d test
-          git push origin :refs/tags/test
+          git tag -d test || true
+          git push origin :refs/tags/test || true
           git tag test
           git push origin refs/tags/test
 
