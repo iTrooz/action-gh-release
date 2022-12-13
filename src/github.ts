@@ -65,6 +65,19 @@ export interface Releaser {
     owner: string;
     repo: string;
   }): AsyncIterableIterator<{ data: Release[] }>;
+
+  createRef(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+    sha: string;
+  }) : Promise<any>;
+
+  deleteRef(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+  }) : Promise<any>;
 }
 
 export class GitHubReleaser implements Releaser {
@@ -120,6 +133,23 @@ export class GitHubReleaser implements Releaser {
     return this.github.paginate.iterator(
       this.github.rest.repos.listReleases.endpoint.merge(updatedParams)
     );
+  }
+
+  createRef(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+    sha: string;
+  }) : Promise<any> {
+    return this.github.rest.git.createRef(params);
+  }
+
+  deleteRef(params: {
+    owner: string;
+    repo: string;
+    ref: string;
+  }) : Promise<any> {
+    return this.github.rest.git.deleteRef(params);
   }
 }
 
@@ -309,6 +339,26 @@ export const release = async (
         ? config.input_prerelease
         : existingRelease.prerelease;
 
+    if(config.input_update_tag){
+      await releaser.deleteRef({
+        owner,
+        repo,
+        ref: "tags/"+existingRelease.tag_name,
+      });
+      await releaser.createRef({
+        owner,
+        repo,
+        ref: "refs/tags/"+existingRelease.tag_name,
+        sha: config.github_sha
+      })
+
+      console.log(`Updated ref/tags/${existingRelease.tag_name} to ${config.github_sha}`);
+      
+      // give github the time to draft the release before updating it
+      // Else, I think we would have a race condition with github to update the release
+      await sleep(2000);
+    }
+    
     const release = await releaser.updateRelease({
       owner,
       repo,
@@ -325,3 +375,7 @@ export const release = async (
     return release.data;
   }
 };
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
