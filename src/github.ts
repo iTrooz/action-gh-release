@@ -200,6 +200,8 @@ export const release = async (
   const generate_release_notes = config.input_generate_release_notes;
   
   if (config.input_draft) {
+    // you can't get a an existing draft by tag
+    // so we must find one in the list of all releases
     for await (const response of releaser.allReleases({
       owner,
       repo,
@@ -214,16 +216,19 @@ export const release = async (
 
   let existingRelease: Release|null = null;
   try {
-    // you can't get a an existing draft by tag
-    // so we must find one in the list of all releases
     existingRelease = (await releaser.getReleaseByTag({
       owner,
       repo,
       tag,
     })).data;
+    console.log(`Found a release with tag ${tag} !`);
   }catch(e){
-    console.log(e);
-    console.log(`Could not fetch existing release with tag ${tag} !`);
+    if(e.status === 404){
+        console.log(`No release with tag ${tag} found`);
+    }else{
+      console.log(`An error occured while fetching the release for the tag ${tag} !`);
+      throw e;
+    }
   }
   if(existingRelease==null){
     const tag_name = tag;
@@ -265,6 +270,7 @@ export const release = async (
       return release(config, releaser, maxRetries - 1);
     }
   }else{
+    console.log(`Updating release with tag ${tag}..`);
     const release_id = existingRelease.id;
     let target_commitish: string;
     if (
